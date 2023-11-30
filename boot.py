@@ -4,7 +4,7 @@ from time import sleep
 SETTINGS: dict = {
     # WIFI:
     "SSID": "",
-    "Password": "",
+    "Password": ""
 }
 
 if __name__ == '__main__':
