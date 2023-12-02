@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Credits           :   Jonas Witte, Jannis Dickel
-# Author            :   Leon Reusch
+# Based on             :   Jonas Witte, Leon Reusch, Jannis Dickel
+# Edited by            :   Leon Reusch
 # -----------------------------------------------------------------------------
 
 from machine import Pin
@@ -20,13 +20,12 @@ class Leds:
     COLOR_LST =[(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 255, 255), (0, 0, 255), (255, 0, 255), (0, 0, 0)]
     OFF = (0, 0, 0)
 
-    def __init__(self, num_leds: int, pin: int):
+    def __init__(self, num_leds: int, pin: int) -> None:
         """
         Constructs a Led-Stripe-Object to connect to
 
         :param num_leds: an int with the count of the LEDs in the Stripe
         :param pin: an int which represents the Pin on the ESP32
-        :return: LED-object
         """
         self.num_leds = num_leds
         self.np = neopixel.NeoPixel(Pin(pin), num_leds)
@@ -94,17 +93,6 @@ class Leds:
             self.set_all(color)
         else:
             self.fade_to(color)
-        
-        #new_pos = self.COLOR_LST.index(color)
-        #old_pos = self.COLOR_LST.index(self.color)
-        #pos_change = new_pos - old_pos
-        
-        #if pos_change > 0:
-            #for i in range(old_pos+1, new_pos+1, 1):
-                #self.fade_to(self.COLOR_LST[i])
-        #elif pos_change < 0:
-            #for i in range(old_pos-1, new_pos-1, -1):
-                #self.fade_to(self.COLOR_LST[i])
                 
     def fade_to(self, color_to: (int, int, int)) -> None:
         """

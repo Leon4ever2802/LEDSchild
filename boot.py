@@ -16,7 +16,7 @@ if __name__ == '__main__':
     print("Trying to connect to WIFI...")
 
     # activating WI-FI:
-    global wlan # global so I can dc in the main
+    global wlan
     wlan = WLAN(STA_IF)
     wlan.active(True)
     wlan.connect(SETTINGS["SSID"], SETTINGS["Password"])  # try to connect with the data from 'SETTINGS-dict'
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     while not wlan.status() == 3:
         continue
         
-    global IP_ADDR # global so I can setup the socket with the given IP_ADDR
+    global IP_ADDR
     IP_ADDR = wlan.ifconfig()[0]
     print(f"\033[92mConnected successfully to WLAN: {wlan.ifconfig()}\033[0m")
     

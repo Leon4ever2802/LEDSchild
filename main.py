@@ -32,18 +32,19 @@ try:
         if s.check_conn_isconnected():
             if s.check_conn():
                 color = s.accept_conn()
-                if color[:3] == (666, 666, 666):
-                    l.rainbow(color[3])
-                elif not color == None:
+                if not color == None:
+                    if color[:3] == (666, 666, 666):
+                        l.rainbow(color[3])
                     l.fade_to(color)
         else:
             if s.check_socket():
                 if s.check_conn():
                     color = s.accept_conn()
-                    if color[:3] == (666, 666, 666):
-                        l.rainbow(color[3])
-                    elif not color == None:
+                    if not color == None:
+                        if color[:3] == (666, 666, 666):
+                            l.rainbow(color[3])
                         l.fade_to(color)
+                    
         l.change(h.distance())
 
 except KeyboardInterrupt:

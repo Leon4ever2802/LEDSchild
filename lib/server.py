@@ -71,16 +71,14 @@ class Server:
             color = tuple(map(int, content.replace("\n", "").split(";")))
             print(color)
             
-            if color[0] == '':
-                self.conn.close()
-                self.conn = None
-                return None
-            
-            return color
+            if self.check_exceptions(color) == None:
+                raise AttributeError()
+            else:
+                return color
         
         except ValueError as e:
             try:
-                if not content.find("GET") == 0 and not content.find("HTTP") > 0:
+                if "GET" not in content and not content.find("HTTP") > 0:
                     raise Exception()
                 
                 pos = content.find("?color=")
@@ -88,42 +86,62 @@ class Server:
                     color = tuple(map(int, content.split(" ")[1][8:].split(";")))
                     print(color)
                     
-                    if not len(color) == 3:
-                        if len(color) == 4 and color[0] == 666 and color[1] == 666 and color[2] == 666 and color[3] > 0:
-                            response = f"<!DOCTYPE html><html><head> <title>LEDSchild</title> </head><body> <h1>Farbe wurde erfolgreich ge&auml;ndert zu:</h1><h2>Rainbow Mode</h2></body></html>"
-                            self.conn.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-                            self.conn.send(response)
-                            self.conn.close()
-                            self.conn = None
-                            return color
+                    if self.check_exceptions(color) == None:
+                        raise AttributeError()
+                    else:
+                        response = f"<!DOCTYPE html><html><head> <title>LEDSchild</title> </head><body> <h1>Farbe wurde erfolgreich ge&auml;ndert zu:</h1>"
+                        if len(color) == 4:
+                            response += f"<h2>Rainbow Mode für {color[3]} Durchl&auml;ufe</h2></body></html>"
                         else:
-                            raise Exception()
-                    
-                    for col in color:
-                        if not 0 <= col <= 255:
-                            raise Exception()
-                
-                    response = f"<!DOCTYPE html><html><head> <title>LEDSchild</title> </head><body> <h1>Farbe wurde erfolgreich ge&auml;ndert zu:</h1><h2>{str(color)}</h2></body></html>"
-                    self.conn.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-                    self.conn.send(response)
-                    self.conn.close()
-                    self.conn = None
-                    return color
+                            response += f"<h2>{str(color)}</h2></body></html>"
+                        self.conn.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+                        self.conn.send(response)
+                        self.conn.close()
+                        self.conn = None
+                        return color
                 else:
-                    raise Exception()
-            except:
+                    raise AttributeError()
+                
+            except (AttributeError, ValueError):
                 response = f"<!DOCTYPE html><html><head> <title>LEDSchild</title> </head><body> <h1>Farbe konnte nicht ge&auml;ndert werden</h1></body></html>"
                 self.conn.send('HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n')
                 self.conn.send(response)
                 self.conn.close()
                 self.conn = None
                 return None
+            except:
+                self.conn.close()
+                self.conn = None
+                return None
             
+        except AttributeError as e:
+            return None
         except:
             self.conn.close()
             self.conn = None
             return None
     
+    def check_exceptions(self, color: (int, int, int)) -> (int, int, int):
+        """
+        Checks for exceptions that can be maybe when passing a value
+        
+        :param color: the given color tuple to check for correctness
+        :return: tuple (int, int, int[, int]) - given color
+        """
+        try:
+            if not len(color) == 3:
+                if len(color) == 4 and color[0] == 666 and color[1] == 666 and color[2] == 666 and color[3] > 0:
+                    return color
+                else:
+                    raise Exception()
+                    
+            for col in color:
+                        if not 0 <= col <= 255:
+                            raise Exception()
+            return color
+        except:
+            return None
+                        
     def check_conn_isconnected(self) -> bool:
         """
         Checks whether a client is still connected or not
