@@ -22,7 +22,7 @@ class HCSR04:
         """
         Measuring the distance of an object in front of the sensor in cm
         
-        :return: distance of the object in cm
+        :return: int - distance of the object in cm
         """
         self.trigger.high()
         sleep_us(3)

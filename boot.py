@@ -1,5 +1,8 @@
+# -----------------------------------------------------------------------------
+# Author               :   Leon Reusch
+# -----------------------------------------------------------------------------
+
 from network import WLAN, STA_IF
-from time import sleep
 
 SETTINGS: dict = {
     # WIFI:
@@ -13,17 +16,16 @@ if __name__ == '__main__':
     print("Trying to connect to WIFI...")
 
     # activating WI-FI:
-    wfi = WLAN(STA_IF)
-    wfi.active(True)
+    global wlan # global so I can dc in the main
+    wlan = WLAN(STA_IF)
+    wlan.active(True)
+    wlan.connect(SETTINGS["SSID"], SETTINGS["Password"])  # try to connect with the data from 'SETTINGS-dict'
 
-    # trying to connect till connected:
-    while not wfi.isconnected():
-        try:
-            wfi.connect(SETTINGS["SSID"], SETTINGS["Password"])  # try to connect with the data from 'SETTINGS-dict'
-
-        except Exception as e:
-            print(f"\033[91mFailed to connect to WIFI. {e} Check the Connections and Settings!\033[0m")
-            sleep(15)  # if something went wrong waiting for 15secs and retrying
-
-    print(f"\033[92mConnected successfully to WLAN: {wfi.ifconfig()}\033[0m")
+    # waiting until device has an IP-Addr and is fully connected
+    while not wlan.status() == 3:
+        continue
+        
+    global IP_ADDR # global so I can setup the socket with the given IP_ADDR
+    IP_ADDR = wlan.ifconfig()[0]
+    print(f"\033[92mConnected successfully to WLAN: {wlan.ifconfig()}\033[0m")
     
