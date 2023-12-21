@@ -18,38 +18,23 @@ def main() -> None:
 
     :return: None
     """
-try:
-    # initialization
-    l = Leds(6, 28)
-    h = HCSR04(17, 16)
-    s = Server(IP_ADDR, 80)
+    try:
+        # initialization
+        led = Leds(6, 28)
+        sensor = HCSR04(17, 16)
+        server = Server(IP_ADDR, 80, led)
 
-    print("Device listening on Port: " + IP_ADDR)
-    s.start()
-    
-    # changing colors depending on the measured distance from the HCSR04
-    while True:
-        if s.check_conn_isconnected():
-            if s.check_conn():
-                color = s.accept_conn()
-                if not color == None:
-                    if color[:3] == (666, 666, 666):
-                        l.rainbow(color[3])
-                    l.fade_to(color)
-        else:
-            if s.check_socket():
-                if s.check_conn():
-                    color = s.accept_conn()
-                    if not color == None:
-                        if color[:3] == (666, 666, 666):
-                            l.rainbow(color[3])
-                        l.fade_to(color)
-                    
-        l.change(h.distance())
+        print("Device listening on Port: " + IP_ADDR)
+        server.start()
+        
+        # changing colors depending on the measured distance from the HCSR04 or HTTP-request
+        while True:
+            server.check()        
+            led.change(sensor.distance())
 
-except KeyboardInterrupt:
-    s.close()
-    wlan.disconnect()
+    except KeyboardInterrupt:
+        server.close()
+        wlan.disconnect()
     
 
 if __name__ == '__main__':
