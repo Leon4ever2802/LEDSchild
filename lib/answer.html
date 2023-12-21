@@ -9,11 +9,11 @@
             }
 
             function sendColor() {
-                const red = parseInt(document.getElementById("color").value.substr(1,2), 16);
-                const green = parseInt(document.getElementById("color").value.substr(3,4), 16);
-                const blue = parseInt(document.getElementById("color").value.substr(5,6), 16);
+                const red = parseInt(document.getElementById("color").value.substr(1, 2), 16);
+                const green = parseInt(document.getElementById("color").value.substr(3, 2), 16);
+                const blue = parseInt(document.getElementById("color").value.substr(5, 6), 16);
                 const Http = new XMLHttpRequest();
-                const url = window.location.href + "/changecolor?color=" + red + ";" + green + ";" + blue;
+                const url = window.location.href + "changecolor?color=" + red + ";" + green + ";" + blue;
                 Http.open("GET", url);
                 Http.send();
             }
