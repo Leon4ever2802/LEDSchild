@@ -6,15 +6,20 @@ import rester
 class Server(rester.Rester):
     
     def __init__(self, host: str, port: int, led):
+        """
+        Initializes a Server-object based on the Rester "api".
+        
+        :
+        """
         super().__init__(self, host, port)
         self.led = led
     
-    def check_exceptions(self, color: (int, int, int)) -> bool:
+    def check_exceptions(self, color) -> bool:
         """
-        Checks for exceptions that can be maybe when passing a value
+        Checks for exceptions that can be maybe when passing a value.
         
-        :param color: the given color tuple to check for correctness
-        :return: tuple (int, int, int[, int]) - given color
+        :param color: (int, int, int) - the given color tuple to check for correctness
+        :return: bool - is given color ok?
         """
         try:
             if not len(color) == 3:
@@ -30,8 +35,12 @@ class Server(rester.Rester):
         except:
             return False
     
-    def get_changecolor(self, color):
+    def get_changecolor(self, color) -> (str, ):
         """
+        Changes the color of the LEDSchild to the given color inside the URL.
+        
+        :param color: the color given inside the URL as a parameter
+        :return: (str, ) - (HTTP.status, )
         """
         set_color = tuple(map(int, color.split(";")))
         print(set_color)
@@ -40,9 +49,14 @@ class Server(rester.Rester):
         
         self.led.fade_to(set_color)
         
-        return self.good_request
+        return (self.good_request, )
         
-    def get_(self):
+    def get_(self) -> (str, str):
+        """
+        Sends the index.html to the client.
+        
+        :return: (str, str) - (HTTP.status, html-code)
+        """
         in_index = open("lib/answer.html")
         index = in_index.read()
         in_index.close()
