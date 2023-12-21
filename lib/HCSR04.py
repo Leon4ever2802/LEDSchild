@@ -8,19 +8,19 @@ from time import sleep_us, ticks_us
 
 class HCSR04:
 
-    def __init__(self, pin_trigger: int, pin_echo: int) -> None:
+    def __init__(self, pin_trigger: int, pin_echo: int):
         """
-        Constructs a HCSR04-sensor-Object to connect to
+        Constructs a HCSR04-sensor-Object to connect to.
 
-        :param pin_trigger: an int with the number of the Pin the trigger is connected to
-        :param pin_echo: an int with the number of the Pin the echo is connected to
+        :param pin_trigger: int - the number of the Pin the trigger is connected to
+        :param pin_echo: int - the number of the Pin the echo is connected to
         """
         self.trigger = Pin(pin_trigger, Pin.OUT)
         self.echo = Pin(pin_echo, Pin.IN)
 
     def distance(self) -> int:
         """
-        Measuring the distance of an object in front of the sensor in cm
+        Measuring the distance of an object in front of the sensor in cm.
         
         :return: int - distance of the object in cm
         """

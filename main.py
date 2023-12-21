@@ -5,9 +5,9 @@
 from lib.leds import Leds
 from lib.HCSR04 import HCSR04
 from lib.server import Server
-from time import sleep
+import asyncio
 
-def main() -> None:
+async def main(led, sensor, server) -> None:
     """
     The main function to a "LEDSchild"
 
@@ -19,23 +19,29 @@ def main() -> None:
     :return: None
     """
     try:
-        # initialization
+        # changing colors depending on the measured distance from the HCSR04
+        while True:
+            led.change(sensor.distance())
+            await asyncio.sleep(0)
+
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == '__main__':
+    try:
+        # initialization of everything ivolved
         led = Leds(6, 28)
         sensor = HCSR04(17, 16)
         server = Server(IP_ADDR, 80, led)
-
-        print("Device listening on Port: " + IP_ADDR)
-        server.start()
         
-        # changing colors depending on the measured distance from the HCSR04 or HTTP-request
-        while True:
-            server.check()        
-            led.change(sensor.distance())
-
+        print("Device listening on Port: " + IP_ADDR)
+        
+        # creating event-loop for sensor + server
+        loop = asyncio.get_event_loop()
+        loop.create_task(server.start())
+        loop.create_task(main(led, sensor, server))
+        loop.run_forever()
+        
     except KeyboardInterrupt:
         server.close()
         wlan.disconnect()
-    
-
-if __name__ == '__main__':
-    main()

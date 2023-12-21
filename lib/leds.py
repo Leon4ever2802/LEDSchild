@@ -20,22 +20,23 @@ class Leds:
     COLOR_LST =[(255, 0, 0), (255, 255, 0), (0, 255, 0), (0, 255, 255), (0, 0, 255), (255, 0, 255), (0, 0, 0)]
     OFF = (0, 0, 0)
 
-    def __init__(self, num_leds: int, pin: int) -> None:
+    def __init__(self, num_leds: int, pin: int):
         """
-        Constructs a Led-Stripe-Object to connect to
+        Constructs a Led-Stripe-Object to connect to.
 
-        :param num_leds: an int with the count of the LEDs in the Stripe
-        :param pin: an int which represents the Pin on the ESP32
+        :param num_leds: int - the count of the LEDs in the Stripe
+        :param pin: int - Port-number of the Pin on the Raspberry
         """
         self.num_leds = num_leds
         self.np = neopixel.NeoPixel(Pin(pin), num_leds)
         self.color = self.OFF
+        self.change_color(self.RED)
 
     def set_all(self, color: tuple[int, int, int]) -> None:
         """
-        Sets all LEDs to the given color
+        Sets all LEDs to the given color.
 
-        :param color: a tuple of 3 ints representing the color on the LED-Stripe (use the 'leds.py' attributes!)
+        :param color: (int, int, int) - 3 ints representing the color on the LED-Stripe (use the 'leds.py' attributes!)
         :return: None
         """
         for led in range(self.num_leds):
@@ -45,9 +46,9 @@ class Leds:
     
     def rainbow(self, loop_duration: int) -> None:
         """
-        Switches all the colors in a rainbow line for a specified duration
+        Switches all the colors in a rainbow line for a specified duration.
         
-        :param loop_duration: number of rainbow run throughs
+        :param loop_duration: int - number of rainbow run throughs
         :return: None
         """
         self.set_all(self.OFF)
@@ -84,9 +85,9 @@ class Leds:
                 
     def change_color(self, color: (int, int, int)) -> None:
         """
-        Changes the color to the given color or simply turns the LEDs on when they are OFF
+        Changes the color to the given color or simply turns the LEDs on when they are OFF.
 
-        :param color: the wanted color
+        :param color: (int, int, int) - the wanted color
         :return: None
         """
         if self.color == self.OFF:
@@ -96,9 +97,9 @@ class Leds:
                 
     def fade_to(self, color_to: (int, int, int)) -> None:
         """
-        Changes the color of the LEDS to the given color by fading to them
+        Changes the color of the LEDS to the given color by fading to them.
 
-        :param color: the wanted color which should be faded to
+        :param color: (int, int, int) - the wanted color which should be faded to
         :return: None
         """
         dif_r = color_to[0] -self.color[0]
@@ -126,7 +127,7 @@ class Leds:
         """
         Changes the color to the corresponding color for the given distance by fading to it
 
-        :param distance: the distance measured by the HCSR04 sensor
+        :param distance: int - the distance measured by the HCSR04 sensor
         :return: None
         """
         if distance < 5:

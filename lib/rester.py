@@ -4,44 +4,52 @@
 
 import socket
 import select
-from exceptions import SocketNotListeningError
 from json import loads
-
+import asyncio
 
 class Rester():
 
+    OK = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
+    BAD_REQUEST = 'HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n'
+    UNAUTHORIZED = 'HTTP/1.0 401 Unauthorized\r\nContent-type: text/html\r\n\r\n'
+    FORBIDDEN = 'HTTP/1.0 403 Forbidden\r\nContent-type: text/html\r\n\r\n'
+    NOT_FOUND = 'HTTP/1.0 404 Not Found\r\nContent-type: text/html\r\n\r\n'
+
     def __init__(self, daughter, host: str, port: int):
         """
-        Constructs a Server-socket to which clients can connect and change the color of the LED-stripe
+        Constructs a Rester-object "api" which can be used for communicating via HTTP.
+        Form of the child-class-methodes: {requestType}{url}(pathVariables || bodyVariables)
 
-        :param host: IP-Addr to be used for the socket
-        :param port: The port number for the socket
-        :return: Server-object
+        :param daughter: object(Rester) - child-class from Rester in which the coresponding methodes to each URL are handled
+        :param host: str - IPv4-Addr to be used for the socket
+        :param port: int - The port number for the socket
         """
         addr = socket.getaddrinfo(host, port)[0][-1]
         self.socket = socket.socket()
         self.socket.setblocking(False)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(addr)
-        self.listening = False
         self.daughter = daughter
         self.conn = None
-        
-        self.good_request = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
-        self.bad_request = 'HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n'
 
-    def start(self) -> None:
+    async def start(self) -> None:
         """
-        Starts the server so it listens to new clients who want to connect
+        Starts the server so it listens to new clients who want to connect.
+        Infinite loop to check for new HTTP-requests.
 
         :return: None
         """
         self.socket.listen(1000)
-        self.listening = True
+        try:
+            while True:
+                self.check()
+                await asyncio.sleep(0)
+        except KeyboardInterrupt:
+            pass
         
     def check_socket(self) -> bool:
         """
-        Checks if a new client wants to connect to the socket
+        Checks if a new client wants to connect to the socket.
 
         :return: bool - new client connected
         """
@@ -49,14 +57,13 @@ class Rester():
             return True
         try:
             self.conn, _ = self.socket.accept()
-            print(self.conn)
             return True
         except OSError as e:
             return False
 
     def check_conn(self) -> bool:
         """
-        Checks if data is available at the connected socket
+        Checks if data is available at the connected socket (HTTP-request).
 
         :return: bool - new data available
         """
@@ -68,12 +75,13 @@ class Rester():
         
     def check_message(self) -> None:
         """
+        Receives the HTTP-request and calls the corosponding methode inside the child-class.
         
+        :return: None
         """
         try:
             message = self.conn.recv(1024).decode()
             request = message.split(" ")[0].lower()
-            print(message)
             url = message.split(" ")[1].split("?")
             url_methode_name = url[0]
             
@@ -96,15 +104,12 @@ class Rester():
             
             
             methode_name = request + url_methode_name.replace("/", "_")
-            print(methode_name)
             func = getattr(self.daughter, methode_name)
             answer = func(**url_methode_parameters_dic, **content_dic)
             
-            if type(answer) == tuple:
-                for ans in answer:
-                    self.conn.send(ans)
-            else:
-                self.conn.send(answer)
+            for ans in answer:
+                self.conn.send(ans)
+                
             self.conn.close()
             self.conn = None
             
@@ -115,23 +120,21 @@ class Rester():
         
     def check(self) -> None:
         """
+        Checks for new messages and processed it when there.
+        
+        :return: None
         """
-        if self.listening:
-            if self.check_conn_isconnected():
-                if self.check_conn():
-                    print(1)
-                    self.check_message()
-            else:
-                if self.check_socket():
-                    if self.check_conn():
-                        print(11)
-                        self.check_message()
+        if self.check_conn_isconnected():
+            if self.check_conn():
+                self.check_message()
         else:
-            raise SocketNotListeningError
+            if self.check_socket():
+                if self.check_conn():
+                    self.check_message()
         
     def check_conn_isconnected(self) -> bool:
         """
-        Checks whether a client is still connected or not
+        Checks whether a client is still connected or not.
 
         :return: bool - client still connected
         """
@@ -142,7 +145,7 @@ class Rester():
     
     def close(self) -> None:
         """
-        Closes the server socket connection
+        Closes the server socket connection.
 
         :return: None
         """
