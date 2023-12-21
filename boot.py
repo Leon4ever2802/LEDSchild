@@ -6,8 +6,8 @@ from network import WLAN, STA_IF
 
 SETTINGS: dict = {
     # WIFI:
-    "SSID": "",
-    "Password": ""
+    "SSID": "iPhone von Leon",
+    "Password": "Kartoffelsalat187"
 }
 
 if __name__ == '__main__':

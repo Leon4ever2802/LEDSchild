@@ -45,11 +45,11 @@ class Server(rester.Rester):
         set_color = tuple(map(int, color.split(";")))
         print(set_color)
         if not self.check_exceptions(set_color):
-            return self.bad_request
+            return self.BAD_REQUEST
         
         self.led.fade_to(set_color)
         
-        return (self.good_request, )
+        return (self.GOOD_REQUEST, )
         
     def get_(self) -> (str, str):
         """
@@ -60,6 +60,6 @@ class Server(rester.Rester):
         in_index = open("lib/answer.html")
         index = in_index.read()
         in_index.close()
-        return (self.good_request, index)
+        return (self.GOOD_REQUEST, index)
         
         

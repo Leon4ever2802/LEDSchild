@@ -6,9 +6,12 @@ import socket
 import select
 from exceptions import SocketNotListeningError
 from json import loads
-
+import asyncio
 
 class Rester():
+
+    GOOD_REQUEST = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
+    BAD_REQUEST = 'HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n'
 
     def __init__(self, daughter, host: str, port: int):
         """
@@ -23,12 +26,8 @@ class Rester():
         self.socket.setblocking(False)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(addr)
-        self.listening = False
         self.daughter = daughter
         self.conn = None
-        
-        self.good_request = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
-        self.bad_request = 'HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n'
 
     def start(self) -> None:
         """
@@ -36,8 +35,16 @@ class Rester():
 
         :return: None
         """
+        print(123)
         self.socket.listen(1000)
-        self.listening = True
+        self.checker()
+        
+    def checker(self) -> None:
+        """
+        """
+        print(1)
+        while True:
+            self.check()
         
     def check_socket(self) -> bool:
         """
@@ -116,18 +123,14 @@ class Rester():
     def check(self) -> None:
         """
         """
-        if self.listening:
-            if self.check_conn_isconnected():
-                if self.check_conn():
-                    print(1)
-                    self.check_message()
-            else:
-                if self.check_socket():
-                    if self.check_conn():
-                        print(11)
-                        self.check_message()
+        if self.check_conn_isconnected():
+            if self.check_conn():
+                print(2)
+                self.check_message()
         else:
-            raise SocketNotListeningError
+            if self.check_socket():
+                if self.check_conn():
+                    self.check_message()
         
     def check_conn_isconnected(self) -> bool:
         """
@@ -147,3 +150,4 @@ class Rester():
         :return: None
         """
         self.socket.close()
+        print("closed")

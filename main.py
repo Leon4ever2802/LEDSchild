@@ -5,7 +5,7 @@
 from lib.leds import Leds
 from lib.HCSR04 import HCSR04
 from lib.server import Server
-from time import sleep
+import asyncio
 
 def main() -> None:
     """
@@ -25,12 +25,13 @@ def main() -> None:
         server = Server(IP_ADDR, 80, led)
 
         print("Device listening on Port: " + IP_ADDR)
-        server.start()
-        
+        asyncio.create_task(server.start())
+        print(4)
         # changing colors depending on the measured distance from the HCSR04 or HTTP-request
-        while True:
-            server.check()        
+        while True:     
             led.change(sensor.distance())
+            print(3)
+            await asyncio.sleep(0.1)
 
     except KeyboardInterrupt:
         server.close()
