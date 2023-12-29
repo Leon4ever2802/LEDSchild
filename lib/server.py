@@ -12,9 +12,9 @@ class Server(rester.Rester):
         :param host: str - the IPv4 addresse on which the server should run
         :param port: int - the port number for the server
         :param led: Leds - Leds-object so it can be controlled
-        :param loop:
-        :param sensor_task:
-        :param sensor_task_function:
+        :param loop: event_loop - loop to cancel/reactivate sensor task
+        :param sensor_task: task - currently running sensor task
+        :param sensor: HCSR04 - sensor object needed for the async methode inside of it
         """
         super().__init__(self, host, port)
         self.led = led
