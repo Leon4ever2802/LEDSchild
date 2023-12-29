@@ -7,39 +7,20 @@ from lib.HCSR04 import HCSR04
 from lib.server import Server
 import asyncio
 
-async def main(led, sensor, server) -> None:
-    """
-    The main function to a "LEDSchild"
-
-    functions:
-        - Changing the colors of a LED stripe by fading to a color corresponding to the measured distance of a
-        HCSR04 sensor
-        - network connection to the raspberry to change color via HTTP-request
-
-    :return: None
-    """
-    try:
-        # changing colors depending on the measured distance from the HCSR04
-        while True:
-            led.change(sensor.distance())
-            await asyncio.sleep(0)
-
-    except KeyboardInterrupt:
-        pass
-
 if __name__ == '__main__':
     try:
-        # initialization of everything ivolved
+        loop = asyncio.get_event_loop()
+        
         led = Leds(6, 28)
-        sensor = HCSR04(17, 16)
-        server = Server(IP_ADDR, 80, led)
+        
+        sensor = HCSR04(17, 16, led)
+        sensor_task = loop.create_task(sensor.change_by_distance())
+        
+        server = Server(IP_ADDR, 80, led, loop, sensor_task, sensor)
+        loop.create_task(server.start())
         
         print("Device listening on Port: " + IP_ADDR)
         
-        # creating event-loop for sensor + server
-        loop = asyncio.get_event_loop()
-        loop.create_task(server.start())
-        loop.create_task(main(led, sensor, server))
         loop.run_forever()
         
     except KeyboardInterrupt:

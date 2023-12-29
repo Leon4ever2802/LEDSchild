@@ -51,7 +51,7 @@ class Rester():
         """
         Checks if a new client wants to connect to the socket.
 
-        :return: bool - new client connected
+        :return: bool - client connected
         """
         if not self.conn == None:
             return True
@@ -83,8 +83,7 @@ class Rester():
             message = self.conn.recv(1024).decode()
             request = message.split(" ")[0].lower()
             url = message.split(" ")[1].split("?")
-            url_methode_name = url[0]
-            
+            url_methode_name = url[0]   
             url_methode_parameters_dic = {}
             try:
                 url_methode_parameters = url[1].split("&")
@@ -97,51 +96,46 @@ class Rester():
             
             content_dic = {}
             content_lenght = 0
-            if "Content-Lenght:" in message:
-                content_part = message.split("Content-Lenght:")[1]
+            if "Content-Length:" in message:
+                content_part = message.split("Content-Length:")[1]
                 content_lenght = int(content_part.split("\n")[0])
                 content_dic = loads(content_part[content_part.find("{"):])
             
-            
             methode_name = request + url_methode_name.replace("/", "_")
-            func = getattr(self.daughter, methode_name)
-            answer = func(**url_methode_parameters_dic, **content_dic)
+            try: 
+                func = getattr(self.daughter, methode_name)
+                answer = func(**url_methode_parameters_dic, **content_dic)
+            except AttributeError:
+                answer = self.BAD_REQUEST
+                pass
             
-            for ans in answer:
-                self.conn.send(ans)
+            if type(answer) == str:
+                self.conn.send(answer)
+            elif type(answer) == tuple:
+                for ans in answer:
+                    self.conn.send(ans)
+            else:
+                raise TypeError
                 
             self.conn.close()
             self.conn = None
             
-        except OSError as e:
-            print(e)
+        except AttributeError:
+            pass
+        
+        except OSError:
             self.conn.close()
             self.conn = None
         
     def check(self) -> None:
         """
-        Checks for new messages and processed it when there.
+        Checks for new messages and processed it when there is one.
         
         :return: None
         """
-        if self.check_conn_isconnected():
+        if self.check_socket():
             if self.check_conn():
                 self.check_message()
-        else:
-            if self.check_socket():
-                if self.check_conn():
-                    self.check_message()
-        
-    def check_conn_isconnected(self) -> bool:
-        """
-        Checks whether a client is still connected or not.
-
-        :return: bool - client still connected
-        """
-        if self.conn == None:
-            return False
-        else:
-            return True
     
     def close(self) -> None:
         """

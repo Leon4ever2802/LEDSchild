@@ -3,6 +3,8 @@
 # -----------------------------------------------------------------------------
 
 from network import WLAN, STA_IF
+from time import sleep
+from machine import reset
 
 SETTINGS: dict = {
     # WIFI:
@@ -22,7 +24,12 @@ if __name__ == '__main__':
     wlan.connect(SETTINGS["SSID"], SETTINGS["Password"])  # try to connect with the data from 'SETTINGS-dict'
 
     # waiting until device has an IP-Addr and is fully connected
+    counter = 0
     while not wlan.status() == 3:
+        if counter == 10:
+            reset()
+        sleep(1)
+        counter = counter + 1
         continue
         
     global IP_ADDR

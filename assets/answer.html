@@ -2,19 +2,35 @@
 <html>
 
     <header>
-        <title>Rasperry LEDSchild Control</title>
+        <title>LED-Schild</title>
+        <link rel="icon" href="data:,">
         <script>
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                }
+            }
+
             function changeSendColor(color) {
                 document.getElementById("send").style.setProperty("--c", color);
+                document.getElementById("block").style.setProperty("--c", color);
             }
 
             function sendColor() {
-                const red = parseInt(document.getElementById("color").value.substr(1, 2), 16);
-                const green = parseInt(document.getElementById("color").value.substr(3, 2), 16);
-                const blue = parseInt(document.getElementById("color").value.substr(5, 6), 16);
+                const rgb = hexToRgb(document.getElementById("color").value)
                 const Http = new XMLHttpRequest();
-                const url = window.location.href + "changecolor?color=" + red + ";" + green + ";" + blue;
+                const url = window.location.href + "changecolor?color=" + rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"];
                 Http.open("GET", url);
+                Http.send();
+            }
+            
+            function blockSensor() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "blocksensor";
+                Http.open("POST", url);
                 Http.send();
             }
         </script>
@@ -43,7 +59,7 @@
                 border: none;
                 cursor: pointer;
                 margin-bottom: 50px;
-                margin-top: 10px;
+                margin-top: 16px;
             }
             #color::-webkit-color-swatch {
                 border-radius: 50%;
@@ -100,10 +116,12 @@
 
         <h1 class="headline">Leons LED-Schild</h1>
         <div class="haupt">
-            <p>Choose a color you want to send to Leons Rasperry "LED-Schild"</p>
+            <p>Choose a color you want to send to Leons Raspberry "LED-Schild"</p>
             <input type="color" id="color" value="#ff0000" onchange="changeSendColor(this.value)"/>
             <br>
             <button onclick="sendColor()" id="send">Send Color</button>
+            <br><br><br>
+            <button onclick="blockSensor()" id="block">Block Sensor</button>
         </div>
         
     </body>
