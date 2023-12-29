@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+    <header>
+        <title>LED-Schild</title>
+        <link rel="icon" href="data:,">
+        <script>
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                }
+            }
+
+            function changeSendColor(color) {
+                document.getElementById("send").style.setProperty("--c", color);
+                document.getElementById("block").style.setProperty("--c", color);
+            }
+
+            function sendColor() {
+                const rgb = hexToRgb(document.getElementById("color").value)
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "changecolor?color=" + rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"];
+                Http.open("GET", url);
+                Http.send();
+            }
+            
+            function blockSensor() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "blocksensor";
+                Http.open("POST", url);
+                Http.send();
+            }
+        </script>
+        <style>
+            .headline {
+                text-align: center;
+                font-size: 100px;
+            }
+
+            body {
+                background-color: wheat;
+                font-family: system-ui, sans-serif;
+            }
+
+            p {
+                font-size: 24px;
+            }
+
+            #color {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-color: transparent;
+                width: 130px;
+                height: 130px;
+                border: none;
+                cursor: pointer;
+                margin-bottom: 50px;
+                margin-top: 16px;
+            }
+            #color::-webkit-color-swatch {
+                border-radius: 50%;
+                border: 5px solid #000000;
+            }
+            #color::-moz-color-swatch {
+                border-radius: 50%;
+                border: 5px solid #000000;
+            }
+
+            button {
+                --c:  red; /* the color*/
+                
+                box-shadow: 0 0 0 .1em inset black; 
+                --_g: linear-gradient(var(--c) 0 0) no-repeat;
+                background: 
+                    var(--_g) calc(var(--_p,0%) - 100%) 0%,
+                    var(--_g) calc(200% - var(--_p,0%)) 0%,
+                    var(--_g) calc(var(--_p,0%) - 100%) 100%,
+                    var(--_g) calc(200% - var(--_p,0%)) 100%;
+                background-size: 50.5% calc(var(--_p,0%)/2 + .5%);
+                outline-offset: .1em;
+                transition: background-size .4s, background-position 0s .4s;
+            }
+            button:hover {
+                --_p: 100%;
+                transition: background-position .15s, background-size 0s;
+            }
+
+            button:active {
+                box-shadow: 0 0 9e9q inset #0009; 
+                background-color: var(--c);
+                color: #fff;
+            }
+
+            button {
+                font-family: system-ui, sans-serif;
+                font-size: 2.0rem;
+                cursor: pointer;
+                padding: .1em .6em;
+                font-weight: bold;  
+                border: none;
+            }
+
+            .haupt {
+                margin: auto;
+                width: 50%;
+                text-align: center;
+            }
+        </style>
+    </header>
+
+    <body>
+
+        <h1 class="headline">Leons LED-Schild</h1>
+        <div class="haupt">
+            <p>Choose a color you want to send to Leons Raspberry "LED-Schild"</p>
+            <input type="color" id="color" value="#ff0000" onchange="changeSendColor(this.value)"/>
+            <br>
+            <button onclick="sendColor()" id="send">Send Color</button>
+            <br><br><br>
+            <button onclick="blockSensor()" id="block">Block Sensor</button>
+        </div>
+        
+    </body>
+
+</html>
