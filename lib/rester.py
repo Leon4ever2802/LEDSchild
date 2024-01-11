@@ -82,7 +82,9 @@ class Rester():
         try:
             message = self.conn.recv(1024).decode()
             request = message.split(" ")[0].lower()
+        
             url = message.split(" ")[1].split("?")
+            
             url_methode_name = url[0]   
             url_methode_parameters_dic = {}
             try:
@@ -99,13 +101,14 @@ class Rester():
             if "Content-Length:" in message:
                 content_part = message.split("Content-Length:")[1]
                 content_lenght = int(content_part.split("\n")[0])
-                content_dic = loads(content_part[content_part.find("{"):])
+                if not content_lenght == 0:
+                    content_dic = loads(content_part[content_part.find("{"):])
             
             methode_name = request + url_methode_name.replace("/", "_")
             try: 
                 func = getattr(self.daughter, methode_name)
                 answer = func(**url_methode_parameters_dic, **content_dic)
-            except AttributeError:
+            except:
                 answer = self.BAD_REQUEST
                 pass
             
