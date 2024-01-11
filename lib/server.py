@@ -12,15 +12,16 @@ class Server(rester.Rester):
         :param host: str - the IPv4 addresse on which the server should run
         :param port: int - the port number for the server
         :param led: Leds - Leds-object so it can be controlled
-        :param loop:
-        :param sensor_task:
-        :param sensor_task_function:
+        :param loop: event_loop - Handeling the async of all tasks
+        :param sensor_task: loop_task - current sensor task inside the loop
+        :param sensor: HCSR04 - HCSR04-object so we can create a task with the measuring methode inside
         """
         super().__init__(self, host, port)
         self.led = led
         self.loop = loop
         self.sensor_task = sensor_task
         self.sensor = sensor
+        self.rainbow_task = None
     
     def check_exceptions(self, color) -> bool:
         """
@@ -43,7 +44,7 @@ class Server(rester.Rester):
         except:
             return False
     
-    def get_changecolor(self, color) -> (str, ):
+    def get_changecolor(self, color) -> str:
         """
         Changes the color of the LEDSchild to the given color inside the URL.
         
@@ -58,7 +59,7 @@ class Server(rester.Rester):
         
         return self.OK
     
-    def post_blocksensor(self) -> (str, ):
+    def get_blocksensor(self) -> str:
         """
         Blocks/Reactivates the HCSR04-sensor.
         
@@ -69,6 +70,18 @@ class Server(rester.Rester):
             self.sensor_task = None
         else:
             self.sensor_task = self.loop.create_task(self.sensor.change_by_distance())
+        return self.OK
+    
+    def get_rainbow(self) -> str:
+        """
+        """
+        try:
+            self.rainbow_task.cancel()
+        except:
+            pass
+        
+        self.rainbow_task = self.loop.create_task(self.led.rainbow())
+        self.led.set_rainbow_task(self.rainbow_task)
         return self.OK
         
     def get_(self) -> (str, str):

@@ -6,7 +6,7 @@
 from machine import Pin
 import neopixel
 from time import sleep
-
+import asyncio
 
 class Leds:
     # initialization of all colors as statics
@@ -31,6 +31,7 @@ class Leds:
         self.np = neopixel.NeoPixel(Pin(pin), num_leds)
         self.color = self.OFF
         self.change_color(self.RED)
+        self.rainbow_task = None
 
     def set_all(self, color: tuple[int, int, int]) -> None:
         """
@@ -43,45 +44,58 @@ class Leds:
             self.np[led] = color
             self.np.write()
             self.color = color
-    
-    def rainbow(self, loop_duration: int) -> None:
+            
+    def cancel_rainbow(self) -> None:
         """
-        Switches all the colors in a rainbow line for a specified duration.
+        Cancels the current rainbow async task.
         
-        :param loop_duration: int - number of rainbow run throughs
+        :return: None
+        
+        """
+        try:
+            self.rainbow_task.cancel()
+            self.rainbow_task = None
+        except:
+            pass
+        
+    def set_rainbow_task(self, rainbow_task) -> None:
+        """
+        """
+        self.rainbow_task = rainbow_task
+    
+    async def rainbow(self) -> None:
+        """
+        Switches all the colors in a rainbow line.
+        
         :return: None
         """
-        self.set_all(self.OFF)
-        print(loop_duration)
-        for i in range(loop_duration):
-            if self.color == self.OFF:
-                for j in range(255):
-                    self.set_all((self.color[0]+1, 0, 0))
-                    sleep(0.02)
+        self.fade_to(self.RED)
+        while True:
+            await asyncio.sleep(0.5)
             if self.color == self.RED:
                 for j in range(255):
                     self.set_all((255, self.color[1]+1, 0))
-                    sleep(0.02)
-            if self.color == self.YELLOW:
+                    await asyncio.sleep(0.01)
+            elif self.color == self.YELLOW:
                 for j in range(255):
                     self.set_all((self.color[0]-1, 255, 0))
-                    sleep(0.02)
-            if self.color == self.GREEN:
+                    await asyncio.sleep(0.01)
+            elif self.color == self.GREEN:
                 for j in range(255):
                     self.set_all((0, 255, self.color[2]+1))
-                    sleep(0.02)
-            if self.color == self.CYAN:
+                    await asyncio.sleep(0.01)
+            elif self.color == self.CYAN:
                 for j in range(255):
                     self.set_all((0, self.color[1]-1, 255))
-                    sleep(0.02)
-            if self.color == self.BLUE:
+                    await asyncio.sleep(0.01)
+            elif self.color == self.BLUE:
                 for j in range(255):
                     self.set_all((self.color[0]+1, 0, 255))
-                    sleep(0.02)
-            if self.color == self.MAGENTA:
+                    await asyncio.sleep(0.01)
+            elif self.color == self.MAGENTA:
                 for j in range(255):
                     self.set_all((255, 0, self.color[2]-1))
-                    sleep(0.02)
+                    await asyncio.sleep(0.01)
                 
     def change_color(self, color: (int, int, int)) -> None:
         """
@@ -90,7 +104,8 @@ class Leds:
         :param color: (int, int, int) - the wanted color
         :return: None
         """
-        if self.color == self.OFF:
+        self.cancel_rainbow()
+        if self.color == self.OFF or color == self.OFF:
             self.set_all(color)
         else:
             self.fade_to(color)
@@ -143,5 +158,5 @@ class Leds:
         elif 26 < distance < 30:
             self.change_color(self.MAGENTA)
         elif 32 < distance < 35:
-            self.set_all(self.OFF)
+            self.change_color(self.OFF)
         

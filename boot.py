@@ -8,8 +8,8 @@ from machine import reset
 
 SETTINGS: dict = {
     # WIFI:
-    "SSID": "",
-    "Password": ""
+    "SSID": "[Enter SSID here]",
+    "Password": "[Enter password here]"
 }
 
 if __name__ == '__main__':

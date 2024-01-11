@@ -30,7 +30,14 @@
             function blockSensor() {
                 const Http = new XMLHttpRequest();
                 const url = window.location.href + "blocksensor";
-                Http.open("POST", url);
+                Http.open("GET", url);
+                Http.send();
+            }
+            
+            function rainbow() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "rainbow";
+                Http.open("GET", url);
                 Http.send();
             }
         </script>
@@ -70,7 +77,7 @@
                 border: 5px solid #000000;
             }
 
-            button {
+            .adaptive {
                 --c:  red; /* the color*/
                 
                 box-shadow: 0 0 0 .1em inset black; 
@@ -84,18 +91,18 @@
                 outline-offset: .1em;
                 transition: background-size .4s, background-position 0s .4s;
             }
-            button:hover {
+            .adaptive:hover {
                 --_p: 100%;
                 transition: background-position .15s, background-size 0s;
             }
 
-            button:active {
+            .adaptive:active {
                 box-shadow: 0 0 9e9q inset #0009; 
                 background-color: var(--c);
                 color: #fff;
             }
 
-            button {
+            .adaptive {
                 font-family: system-ui, sans-serif;
                 font-size: 2.0rem;
                 cursor: pointer;
@@ -109,6 +116,25 @@
                 width: 50%;
                 text-align: center;
             }
+
+            #rainbow {
+                font-family: system-ui, sans-serif;
+                font-size: 2.0rem;
+                cursor: pointer;
+                padding: .1em .6em;
+                font-weight: bold;  
+                border: none;
+                box-shadow: 0 0 0 .1em inset black; 
+                background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
+            }
+
+            #rainbow:hover {
+                box-shadow: 0 0 0 .1em inset white; 
+            }
+
+            #rainbow:active {
+                color: #fff;
+            }
         </style>
     </header>
 
@@ -119,9 +145,11 @@
             <p>Choose a color you want to send to Leons Raspberry "LED-Schild"</p>
             <input type="color" id="color" value="#ff0000" onchange="changeSendColor(this.value)"/>
             <br>
-            <button onclick="sendColor()" id="send">Send Color</button>
+            <button onclick="sendColor()" class="adaptive" id="send">Send Color</button>
             <br><br><br>
-            <button onclick="blockSensor()" id="block">Block Sensor</button>
+            <button onclick="blockSensor()" class="adaptive" id="block">Block Sensor</button>
+            <br><br><br>
+            <button onclick="rainbow()" id="rainbow">Rainbow Mode</button>
         </div>
         
     </body>
