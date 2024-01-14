@@ -37,7 +37,7 @@ class Leds:
         """
         Sets all LEDs to the given color.
 
-        :param color: (int, int, int) - 3 ints representing the color on the LED-Stripe (use the 'leds.py' attributes!)
+        :param color: (int, int, int) - new color for the LED-Stripe
         :return: None
         """
         for led in range(self.num_leds):
@@ -50,7 +50,6 @@ class Leds:
         Cancels the current rainbow async task.
         
         :return: None
-        
         """
         try:
             self.rainbow_task.cancel()
@@ -60,12 +59,16 @@ class Leds:
         
     def set_rainbow_task(self, rainbow_task) -> None:
         """
+        Sets the rainbow task to the given task
+        
+        :param rainbow_task: loop_task - current rainbow task
+        :return: None
         """
         self.rainbow_task = rainbow_task
     
     async def rainbow(self) -> None:
         """
-        Switches all the colors in a rainbow line.
+        Switches all the colors in a rainbow line unlimitedly.
         
         :return: None
         """

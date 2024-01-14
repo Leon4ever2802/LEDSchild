@@ -46,7 +46,7 @@ class Server(rester.Rester):
     
     def get_changecolor(self, color) -> str:
         """
-        Changes the color of the LEDSchild to the given color inside the URL.
+        Changes the color of the LED-Schild to the given color inside the URL.
         
         :param color: the color given inside the URL as a parameter
         :return: str - HTTP.status
@@ -74,6 +74,9 @@ class Server(rester.Rester):
     
     def get_rainbow(self) -> str:
         """
+        Makes the LED-Schild run through the color spectrum
+        
+        :return: str - HTTP.status
         """
         try:
             self.rainbow_task.cancel()
