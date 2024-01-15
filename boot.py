@@ -5,12 +5,7 @@
 from network import WLAN, STA_IF
 from time import sleep
 from machine import reset
-
-SETTINGS: dict = {
-    # WIFI:
-    "SSID": "[Enter SSID here]",
-    "Password": "[Enter password here]"
-}
+from settings import SETTINGS
 
 if __name__ == '__main__':
     
@@ -32,7 +27,6 @@ if __name__ == '__main__':
         counter = counter + 1
         continue
         
-    global IP_ADDR
-    IP_ADDR = wlan.ifconfig()[0]
+    SETTINGS["IP-Addr"] = wlan.ifconfig()[0]
     print(f"\033[92mConnected successfully to WLAN: {wlan.ifconfig()}\033[0m")
     

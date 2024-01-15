@@ -16,6 +16,7 @@ class HCSR04:
 
         :param pin_trigger: int - the number of the Pin the trigger is connected to
         :param pin_echo: int - the number of the Pin the echo is connected to
+        :param led: Leds - Leds-object so it can be controlled
         """
         self.trigger = Pin(pin_trigger, Pin.OUT)
         self.echo = Pin(pin_echo, Pin.IN)

@@ -2,14 +2,49 @@
 <html>
 
     <header>
-        <title>LED-sign</title>
+        <title>LED-Schild</title>
         <link rel="icon" href="data:,">
-        <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+        <script>
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                }
+            }
+
+            function changeSendColor(color) {
+                document.getElementById("send").style.setProperty("--c", color);
+                document.getElementById("block").style.setProperty("--c", color);
+            }
+
+            function sendColor() {
+                const rgb = hexToRgb(document.getElementById("color").value)
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "changecolor?color=" + rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"];
+                Http.open("GET", url);
+                Http.send();
+            }
+            
+            function blockSensor() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "blocksensor";
+                Http.open("GET", url);
+                Http.send();
+            }
+            
+            function rainbow() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "rainbow";
+                Http.open("GET", url);
+                Http.send();
+            }
+        </script>
         <style>
             .headline {
                 text-align: center;
                 font-size: 100px;
-                margin-bottom: 50px;
             }
 
             body {
@@ -18,8 +53,28 @@
             }
 
             p {
-                margin-bottom: 70px;
                 font-size: 24px;
+            }
+
+            #color {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background-color: transparent;
+                width: 130px;
+                height: 130px;
+                border: none;
+                cursor: pointer;
+                margin-bottom: 50px;
+                margin-top: 16px;
+            }
+            #color::-webkit-color-swatch {
+                border-radius: 50%;
+                border: 5px solid #000000;
+            }
+            #color::-moz-color-swatch {
+                border-radius: 50%;
+                border: 5px solid #000000;
             }
 
             .adaptive {
@@ -54,7 +109,6 @@
                 padding: .1em .6em;
                 font-weight: bold;  
                 border: none;
-                margin: 20px 0 20px 0;
             }
 
             .haupt {
@@ -65,7 +119,7 @@
 
             #rainbow {
                 font-family: system-ui, sans-serif;
-                margin: 20px 0 100px 0;
+                margin-bottom: 100px;
                 font-size: 2.0rem;
                 cursor: pointer;
                 padding: .1em .6em;
@@ -82,83 +136,22 @@
             #rainbow:active {
                 color: #fff;
             }
-
-            #picker {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin-bottom: 50px;
-                margin-top: 20px;
-                border: 0 0 0 .1em inset black;
-            }
         </style>
     </header>
 
     <body>
 
-        <h1 class="headline">Raspberry LED-sign</h1>
+        <h1 class="headline">Leons LED-Schild</h1>
         <div class="haupt">
-            <p>Choose a color you want to send to the Raspberry LED-sign</p>
-            <div id="picker"></div>
+            <p>Choose a color you want to send to Leons Raspberry "LED-Schild"</p>
+            <input type="color" id="color" value="#ff0000" onchange="changeSendColor(this.value)"/>
+            <br>
             <button onclick="sendColor()" class="adaptive" id="send">Send Color</button>
-            <br>
+            <br><br><br>
             <button onclick="blockSensor()" class="adaptive" id="block">Block Sensor</button>
-            <br>
+            <br><br><br>
             <button onclick="rainbow()" id="rainbow">Rainbow Mode</button>
         </div>
-        
-
-
-        <script>
-            var colorPicker = new iro.ColorPicker("#picker", {
-                borderColor: '#000000',
-                width: 400,
-                color: "#f00",
-                layout: [
-                    {
-                    component: iro.ui.Wheel,
-                    options: {
-                        borderColor: '#000000',
-                        borderWidth: 4
-                        }
-                    },
-                    {
-                    component: iro.ui.Slider,
-                    options: {
-                        borderColor: '#000000',
-                        borderWidth: 3
-                        }
-                    }
-                ]
-            });
-
-            colorPicker.on('color:change', function(color){
-                document.getElementById("send").style.setProperty("--c", color.hexString);
-                document.getElementById("block").style.setProperty("--c", color.hexString);
-            });
-
-            function sendColor() {
-                const rgb = colorPicker.color.rgb;
-                const Http = new XMLHttpRequest();
-                const url = window.location.href + "changecolor?color=" + rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"];
-                Http.open("GET", url);
-                Http.send();
-            }
-            
-            function blockSensor() {
-                const Http = new XMLHttpRequest();
-                const url = window.location.href + "blocksensor";
-                Http.open("GET", url);
-                Http.send();
-            }
-            
-            function rainbow() {
-                const Http = new XMLHttpRequest();
-                const url = window.location.href + "rainbow";
-                Http.open("GET", url);
-                Http.send();
-            }
-        </script>
 
     </body>
 
