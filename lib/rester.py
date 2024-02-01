@@ -82,7 +82,7 @@ class Rester():
         try:
             message = self.conn.recv(1024).decode()
             request = message.split(" ")[0].lower()
-        
+            
             url = message.split(" ")[1].split("?")
             
             url_methode_name = url[0]   
@@ -105,7 +105,7 @@ class Rester():
                     content_dic = loads(content_part[content_part.find("{"):])
             
             methode_name = request + url_methode_name.replace("/", "_")
-            try: 
+            try:
                 func = getattr(self.daughter, methode_name)
                 answer = func(**url_methode_parameters_dic, **content_dic)
             except:
