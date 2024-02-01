@@ -63,8 +63,11 @@ def main() -> None:
         loop.run_forever()
         
     except KeyboardInterrupt:
-        server.close()
-        wlan.disconnect()
+        try:
+            server.close()
+            wlan.disconnect()
+        except:
+            pass
 
 if __name__ == '__main__':
     main()
