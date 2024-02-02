@@ -59,7 +59,7 @@ class Server(rester.Rester):
         
         return self.OK
     
-    def get_blocksensor(self) -> str:
+    def get_sensor(self) -> str:
         """
         Blocks/Reactivates the HCSR04-sensor.
         
@@ -74,7 +74,7 @@ class Server(rester.Rester):
     
     def get_rainbow(self) -> str:
         """
-        Makes the LED-Schild run through the color spectrum
+        Makes the LED-Schild run through the color spectrum.
         
         :return: str - HTTP.status
         """
@@ -87,6 +87,20 @@ class Server(rester.Rester):
         self.led.set_rainbow_task(self.rainbow_task)
         return self.OK
         
+    def get_turnoff(self) -> str:
+        """
+        Deactivates the HCSR04 sensor and turns the Leds to OFF.
+        
+        :return: str - HTTP.status
+        """
+        try:
+            self.sensor_task.cancel()
+            self.sensor_task = None
+        except:
+            pass
+        self.led.change_color(self.led.OFF)
+        return self.OK
+    
     def get_(self) -> (str, str):
         """
         Sends the index.html to the client.

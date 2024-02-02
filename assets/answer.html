@@ -102,7 +102,9 @@
             <div id="picker"></div>
             <button onclick="sendColor()" class="adaptive" id="send">Send Color</button>
             <br>
-            <button onclick="blockSensor()" class="adaptive" id="block">Block Sensor</button>
+            <button onclick="sensor()" class="adaptive" id="block">De-/Activate Sensor</button>
+            <br>
+            <button onclick="turnOff()" class="adaptive" id="block">Turn Off</button>
             <br>
             <button onclick="rainbow()" id="rainbow">Rainbow Mode</button>
         </div>
@@ -145,9 +147,9 @@
                 Http.send();
             }
             
-            function blockSensor() {
+            function sensor() {
                 const Http = new XMLHttpRequest();
-                const url = window.location.href + "blocksensor";
+                const url = window.location.href + "sensor";
                 Http.open("GET", url);
                 Http.send();
             }
@@ -155,6 +157,13 @@
             function rainbow() {
                 const Http = new XMLHttpRequest();
                 const url = window.location.href + "rainbow";
+                Http.open("GET", url);
+                Http.send();
+            }
+
+            function turnOff() {
+                const Http = new XMLHttpRequest();
+                const url = window.location.href + "turnoff";
                 Http.open("GET", url);
                 Http.send();
             }
