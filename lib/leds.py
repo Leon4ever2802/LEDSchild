@@ -30,7 +30,6 @@ class Leds:
         self.num_leds = num_leds
         self.np = neopixel.NeoPixel(Pin(pin), num_leds)
         self.color = self.OFF
-        self.change_color(self.RED)
         self.rainbow_task = None
 
     def set_all(self, color: tuple[int, int, int]) -> None:
@@ -139,11 +138,32 @@ class Leds:
             else:
                 new_color += (self.color[2], )
             self.set_all(new_color)
-        
+    
+    def wlan_active(self) -> None:
+        """
+        Lets the Leds pop up green 3 times indicating WLAN connection was successful.
+
+        :return: None
+        """
+        for i in range(2):
+            self.fade_to(self.GREEN)
+            self.fade_to(self.OFF)
+        self.fade_to(self.GREEN)
+    
+    def wlan_not_active(self) -> None:
+        """
+        Lets the Leds pop up red 3 times indicating WLAN connection was unsuccessful.
+
+        :return: None
+        """
+        for i in range(2):
+            self.fade_to(self.RED)
+            self.fade_to(self.OFF)
+        self.fade_to(self.RED)
         
     def change(self, distance: int) -> None:
         """
-        Changes the color to the corresponding color for the given distance by fading to it
+        Changes the color to the corresponding color for the given distance by fading to it.
 
         :param distance: int - the distance measured by the HCSR04 sensor
         :return: None
