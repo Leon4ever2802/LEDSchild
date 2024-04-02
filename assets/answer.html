@@ -104,7 +104,7 @@
             <br>
             <button onclick="sensor()" class="adaptive" id="block">De-/Activate Sensor</button>
             <br>
-            <button onclick="turnOff()" class="adaptive" id="block">Turn Off</button>
+            <button onclick="turnOffOn()" class="adaptive" id="block">Turn Off/On</button>
             <br>
             <button onclick="rainbow()" id="rainbow">Rainbow Mode</button>
         </div>
@@ -161,9 +161,9 @@
                 Http.send();
             }
 
-            function turnOff() {
+            function turnOffOn() {
                 const Http = new XMLHttpRequest();
-                const url = window.location.href + "turnoff";
+                const url = window.location.href + "turnoffon";
                 Http.open("GET", url);
                 Http.send();
             }

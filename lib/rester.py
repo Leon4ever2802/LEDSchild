@@ -7,7 +7,17 @@ import select
 from json import loads
 import asyncio
 
-class Rester():
+
+class Rester:
+    """
+    A rest api class which creates a socket which clients can connect to via HTTP.
+    A child-class of this class can be customized on your needs.
+    Following call must be done inside the constructor of the child class:\n
+    super().__init__(self, host, port)\n
+    Afterwards the server must only call \"start()\" and connections can get accepted and will be handled.\n
+    Form of the child-class-methods should look like the following:\n
+    {requestType}{url}(pathVariablesName || bodyVariablesName)
+    """
 
     OK = 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n'
     BAD_REQUEST = 'HTTP/1.0 400 Bad Request\r\nContent-type: text/html\r\n\r\n'
@@ -18,11 +28,10 @@ class Rester():
     def __init__(self, daughter, host: str, port: int):
         """
         Constructs a Rester-object "api" which can be used for communicating via HTTP.
-        Form of the child-class-methodes: {requestType}{url}(pathVariables || bodyVariables)
 
-        :param daughter: object(Rester) - child-class from Rester in which the coresponding methodes to each URL are handled
-        :param host: str - IPv4-Addr to be used for the socket
-        :param port: int - The port number for the socket
+        :param daughter: child-class from Rester in which the corresponding methods to each URL are handled
+        :param host: IPv4-Addr to be used for the socket
+        :param port: The port number for the socket
         """
         addr = socket.getaddrinfo(host, port)[0][-1]
         self.socket = socket.socket()
@@ -34,7 +43,7 @@ class Rester():
 
     async def start(self) -> None:
         """
-        Starts the server so it listens to new clients who want to connect.
+        Starts the server, so it listens to new clients who want to connect.
         Infinite loop to check for new HTTP-requests.
 
         :return: None
@@ -46,14 +55,14 @@ class Rester():
                 await asyncio.sleep(0)
         except KeyboardInterrupt:
             pass
-        
+
     def check_socket(self) -> bool:
         """
         Checks if a new client wants to connect to the socket.
 
         :return: bool - client connected
         """
-        if not self.conn == None:
+        if self.conn is not None:
             return True
         try:
             self.conn, _ = self.socket.accept()
@@ -72,38 +81,38 @@ class Rester():
             return ready_socket
         except OSError as e:
             return False
-        
+
     def check_message(self) -> None:
         """
-        Receives the HTTP-request and calls the corosponding methode inside the child-class.
+        Receives the HTTP-request and calls the corresponding methode inside the child-class.
         
         :return: None
         """
         try:
             message = self.conn.recv(1024).decode()
             request = message.split(" ")[0].lower()
-            
+
             url = message.split(" ")[1].split("?")
-            
-            url_methode_name = url[0]   
+
+            url_methode_name = url[0]
             url_methode_parameters_dic = {}
             try:
                 url_methode_parameters = url[1].split("&")
                 for parameter in url_methode_parameters:
                     values = parameter.split("=")
                     url_methode_parameters_dic[values[0]] = values[1]
-                    
+
             except IndexError:
                 pass
-            
+
             content_dic = {}
-            content_lenght = 0
+            content_length = 0
             if "Content-Length:" in message:
                 content_part = message.split("Content-Length:")[1]
-                content_lenght = int(content_part.split("\n")[0])
-                if not content_lenght == 0:
+                content_length = int(content_part.split("\n")[0])
+                if not content_length == 0:
                     content_dic = loads(content_part[content_part.find("{"):])
-            
+
             methode_name = request + url_methode_name.replace("/", "_")
             try:
                 func = getattr(self.daughter, methode_name)
@@ -111,7 +120,7 @@ class Rester():
             except:
                 answer = self.BAD_REQUEST
                 pass
-            
+
             if type(answer) == str:
                 self.conn.send(answer)
             elif type(answer) == tuple:
@@ -119,17 +128,17 @@ class Rester():
                     self.conn.send(ans)
             else:
                 raise TypeError
-                
+
             self.conn.close()
             self.conn = None
-            
+
         except AttributeError:
             pass
-        
+
         except OSError:
             self.conn.close()
             self.conn = None
-        
+
     def check(self) -> None:
         """
         Checks for new messages and processed it when there is one.
@@ -139,7 +148,7 @@ class Rester():
         if self.check_socket():
             if self.check_conn():
                 self.check_message()
-    
+
     def close(self) -> None:
         """
         Closes the server socket connection.
