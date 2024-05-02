@@ -58,7 +58,7 @@ def main() -> None:
     if SETTINGS["IP-Addr"] != "":
         server = Server(SETTINGS["IP-Addr"], SETTINGS["ServerPort"], led, loop, sensor_task, sensor)
         loop.create_task(server.start())
-        print("Device listening on Port: " + SETTINGS["IP-Addr"])
+        print("Device listening on: " + SETTINGS["IP-Addr"])
         led.wlan_active()
     else:
         loop.create_task(connect_to_wlan(loop, led, sensor_task, sensor))

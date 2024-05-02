@@ -51,7 +51,7 @@ class Server(rester.Rester):
         except:
             return False
 
-    def get_changecolor(self, color: str) -> str:
+    def put_changecolor(self, color: str) -> str:
         """
         Changes the color of the LED-Schild to the given color inside the URL.
         
@@ -66,7 +66,7 @@ class Server(rester.Rester):
 
         return self.OK
 
-    def get_sensor(self) -> str:
+    def post_sensor(self) -> str:
         """
         Blocks/Reactivates the HCSR04-sensor.
         
@@ -79,7 +79,7 @@ class Server(rester.Rester):
             self.sensor_task = self.loop.create_task(self.sensor.change_by_distance())
         return self.OK
 
-    def get_rainbow(self) -> str:
+    def post_rainbow(self) -> str:
         """
         Makes the LED-Schild run through the color spectrum.
         
@@ -94,7 +94,7 @@ class Server(rester.Rester):
         self.led.set_rainbow_task(self.rainbow_task)
         return self.OK
 
-    def get_turnoffon(self) -> str:
+    def put_turnoffon(self, color: str) -> str:
         """
         Deactivates the HCSR04 sensor and turns the Leds to OFF.
         If both are deactivated, sensor will be started and LED set to RED.
@@ -107,7 +107,8 @@ class Server(rester.Rester):
         except:
             if self.led.color == self.led.OFF:
                 self.sensor_task = self.loop.create_task(self.sensor.change_by_distance())
-                self.led.change_color(self.led.RED)
+                set_color = tuple(map(int, color.split(";")))
+                self.led.change_color(set_color)
                 return self.OK
             pass
         self.led.change_color(self.led.OFF)

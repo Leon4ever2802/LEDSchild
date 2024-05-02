@@ -104,7 +104,7 @@
             <br>
             <button onclick="sensor()" class="adaptive" id="block">De-/Activate Sensor</button>
             <br>
-            <button onclick="turnOffOn()" class="adaptive" id="block">Turn Off/On</button>
+            <button onclick="turnOffOn()" class="adaptive" id="turnOffOn">Turn Off/On</button>
             <br>
             <button onclick="rainbow()" id="rainbow">Rainbow Mode</button>
         </div>
@@ -137,35 +137,39 @@
             colorPicker.on('color:change', function(color){
                 document.getElementById("send").style.setProperty("--c", color.hexString);
                 document.getElementById("block").style.setProperty("--c", color.hexString);
+                document.getElementById("turnOffOn").style.setProperty("--c", color.hexString);
             });
 
             function sendColor() {
                 const rgb = colorPicker.color.rgb;
-                const Http = new XMLHttpRequest();
-                const url = window.location.href + "changecolor?color=" + rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"];
-                Http.open("GET", url);
-                Http.send();
+                const http = new XMLHttpRequest();
+                const url = window.location.href + "changecolor";
+                http.open("PUT", url);
+                http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                http.send(JSON.stringify({"color" : rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"]}));
             }
             
             function sensor() {
-                const Http = new XMLHttpRequest();
+                const http = new XMLHttpRequest();
                 const url = window.location.href + "sensor";
-                Http.open("GET", url);
-                Http.send();
+                http.open("POST", url);
+                http.send();
             }
             
             function rainbow() {
-                const Http = new XMLHttpRequest();
+                const http = new XMLHttpRequest();
                 const url = window.location.href + "rainbow";
-                Http.open("GET", url);
-                Http.send();
+                http.open("POST", url);
+                http.send();
             }
 
             function turnOffOn() {
-                const Http = new XMLHttpRequest();
+                const rgb = colorPicker.color.rgb;
+                const http = new XMLHttpRequest();
                 const url = window.location.href + "turnoffon";
-                Http.open("GET", url);
-                Http.send();
+                http.open("PUT", url);
+                http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                http.send(JSON.stringify({"color" : rgb["r"] + ";" + rgb["g"] + ";" + rgb["b"]}));
             }
         </script>
 
