@@ -89,10 +89,18 @@ class Rester:
         :return: None
         """
         try:
-            message = self.conn.recv(1024).decode()
-            request = message.split(" ")[0].lower()
+            message = ""
+            while True:
+                try:
+                    message += self.conn.recv(1024).decode()
+                except OSError:
+                    break
+            
+            message_spacebar_split = message.split(" ")
+            
+            request = message_spacebar_split[0].lower()
 
-            url = message.split(" ")[1].split("?")
+            url = message_spacebar_split[1].split("?")
 
             url_methode_name = url[0]
             url_methode_parameters_dic = {}
@@ -104,17 +112,20 @@ class Rester:
 
             except IndexError:
                 pass
-
+            
             content_dic = {}
-            content_length = 0
-            if "Content-Length:" in message:
-                content_part = message.split("Content-Length:")[1]
-                content_length = int(content_part.split("\n")[0])
-                if not content_length == 0:
-                    content_dic = loads(content_part[content_part.find("{"):])
-
-            methode_name = request + url_methode_name.replace("/", "_")
+            message_newline_split = message.split("\n")
             try:
+                content_length = int([part for part in message_newline_split if "Content-Length:" in part][0].split(" ")[1])
+            except:
+                content_length = 0
+               
+            try:
+                if content_length != 0:
+                    content_part = "".join(message_newline_split[message_newline_split.index("\r")+1:])
+                    content_dic = loads(content_part)
+
+                methode_name = request + url_methode_name.replace("/", "_")
                 func = getattr(self.daughter, methode_name)
                 answer = func(**url_methode_parameters_dic, **content_dic)
             except:
